@@ -22,9 +22,16 @@ router.post('/', async (req, res) => {
     }
     if (req.body.imageUrl) contactPayload['imageUrl'] = req.body.imageUrl;
 
-    const contact = await req.context.models.Contact.create(contactPayload);
+    if (req.body._id && req.body._id.length) {
+        let query = { $set: contactPayload };
+        const contact = await req.context.models.Contact.updateOne({ _id: req.body._id }, query);
+        return res.send(contact);
+    } else {
+        const contact = await req.context.models.Contact.create(contactPayload);
+        return res.send(contact);
+    }
 
-    return res.send(contact);
+
 });
 
 router.delete('/:contactId', async (req, res) => {
